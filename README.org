@@ -1,0 +1,248 @@
+#+title: A gentle introduction to Common Lisp
+
+* Preface
+
+I thought taking advantage of =org-babel= would be nice as one works
+through programming books. It encourages you to play around while
+taking notes, or just organizing your scratch when you don't take any
+notes (which is more up my alley). It's easy to find these books
+rather boring, but I think that's due to a lack of engagement (not
+doing the exercises). If it's frictionless, then it's a little
+rewarding to use the knowledge you just acquired. Only by involving
+yourself will you remember and learn something.
+
+Although I got through a good portion of the book by skimming, now
+I'll restart and go through the exercises, putting concepts into my
+own words when necessary.
+
+
+* Chapter 1: Functions and Data
+Mostly a cursory overview on how computer languages work.
+
+#+begin_src lisp
+  ;; ratios
+  (/ 8 2)
+  (/ 2 8)
+
+  ;; 1.1 exercise answers
+  ;; 13
+  ;; 3
+  ;; /
+  ;; 3
+  ;; 3
+  ;; -48
+  ;; 5/3
+  (/ 15 9)
+  ;; 0
+  (+ 8 0)
+  ;; -
+  (- 5 6)
+  ;; 2/3
+  (- 1 1/3)
+  ;; 2
+  (abs (+ -5 3))
+
+#+end_src
+
+** symbols
+My initial understanding of symbols are that they're just pointers. A
+more convenient way to reference data.
+*** 1.2 exercise answers
+S, I, S, S, I, I, I, S, S, I, I, S
+
+** predicates
+
+#+begin_src lisp
+  (numberp 2)
+  (symbolp 'cat)
+  (zerop 0)
+  (oddp 3)
+  (evenp 29)
+  (< 2 3)
+  (< 3 2)
+  (> 2 3)
+
+  (equalp 1 1.0)
+#+end_src
+
+*** 1.3 exercise
+#+begin_src lisp
+  ;; t
+  (< 7 11)
+  ;; nil
+  (oddp 12)
+  ;; nil
+  ;; t
+  ;; t
+  (< -4 -3)
+  ;; t
+  ;; nil
+  (equal -9 9)
+#+end_src
+
+** creating functions
+
+#+begin_src lisp
+  (defun add1 (n)
+    (+ n 1))
+
+  (add1 5)
+
+  (defun add2 (n)
+    (add1
+     (add1 n)))
+
+  (add2 5)
+
+  (defun twop (n)
+    (equal 2 n))
+  (twop 2)
+#+end_src
+*** exercises
+#+begin_src lisp
+  ;; define a sub2 func that subs two from input
+  (defun sub2 (n)
+    (- n 2))
+
+  (sub2 2)
+  ;; show how to write twop in terms of zerop and sub2
+  (defun twop (n)
+    (zerop
+     (sub2 n)))
+
+  (twop 2)
+  ;; the half func returns num one-half of its input
+  ;; show how to define half two diff ways
+  (defun half (n)
+    (/ n 2))
+
+  (defun half (n)
+    (* 0.5 n))
+
+  (half 10)
+
+  ;; write multi-digit-p pred that ret true if input is > 9
+  (defun multi-digit-p (n)
+    "Returns true if N has more than 1 digit"
+    (> (abs n) 9))
+
+  (multi-digit-p -9)
+  (multi-digit-p -11)
+
+  ;; following function negates the input
+  (defun negate (n)
+    (- 0 n))
+  (negate 9)
+
+  ;; 1.9
+  (defun twomorep (x y)
+    (equal x (add2 y)))
+  (twomorep 9 7)
+
+  ;; 1.10
+  (defun twomorep (x y)
+    (equal (sub2 x) y))
+  (twomorep 9 7)
+
+  ;; 1.11
+  (defun average (x y)
+    (/ (+ x y) 2))
+  (average 10 20)
+
+  ;; 1.12
+  (defun more-than-half-p (x y)
+    (> x (/ y 2)))
+
+  (more-than-half-p 4 6)
+
+  ;; 1.13: true, since nil or t are symbols and those are the only
+  ;; available return values from numberp
+#+end_src
+
+** not predicate/negating predicate
+*** exercises
+#+begin_src lisp
+  ;; 1.14
+  ;; t
+  (not nil)
+  ;; nil
+  (not 12)
+  ;; nil
+  (not #'not)
+
+  ;; 1.15 write pred not-onep that ret T if input != 1
+  (defun not-onep (n)
+    (not (equal 1 n)))
+  (not-onep 2)
+
+  ;; 1.16 write pred not-plusp that ret t if input not > 0
+  (defun not-plusp (n)
+    (not (> n 0)))
+  (not-plusp -3)
+
+  ;; 1.17
+  (defun my-evenp (n)
+    (not (oddp n)))
+  (my-evenp 2)
+
+  ;; .18, returns T if N = -2
+  (defun pred18 (n)
+    (zerop 
+     (add1
+      (add1 n))))
+  (pred18 -2)
+
+  ;; .19 nil -> nil
+  ;; t -> t
+  ;; not all data, symbols are transformed to t
+  (defun dubnot (n)
+    (not (not n)))
+  (dubnot nil)
+  (dubnot t)
+  (dubnot 'mysym)
+
+  ;; .20 write xor
+  (defun xor (x y)
+    (not (equal x y)))
+  (xor t nil)
+  (xor t t)
+  (xor nil nil)
+  
+#+end_src
+** multiple inputs
+additive functions are applied w/ multiple while order dependent funcs
+clump last args and apply to first
+#+begin_src lisp
+  (* 50 3 4)
+  (- 50 3 4)
+  (/ 50 25 2)
+  (/ 50)
+  (- 4)
+  (equal)
+#+end_src
+** errors
+*** exercises
+1.21
+a. func is adding to a symbol
+b. equal not supplied 2 args
+c. not is supplied with too many args
+
+** review
+- 1.22 Yes, all predicates are functions, but not all functions are
+predicates.
+- 1.23 equal, not
+- 1.24 NUMBER is not a number, is a symbol. And SYMBOL is another
+  symbol.
+- 1.25 because FALSE is a symbol, and symbols eval to T. False is
+  represented by NIL
+- 1.26 a) false, example: < or > do not accept t/nil. (b) is true.
+- 1.27:
+#+begin_src lisp
+  (evenp 'symbol) ;; wrong type input, evenp expects number
+  (evenp 2 4) ;; wrong-number-of-inputs error, as evenp wanats only 1 arg
+#+end_src
+
+
+
+* Chapter 2: Lists
+The most important data type :~)
