@@ -47,6 +47,14 @@ Mostly a cursory overview on how computer languages work.
 ** symbols
 My initial understanding of symbols are that they're just pointers. A
 more convenient way to reference data.
+BUT symbols can exist without any reference. I'm sure this'll clear up
+more later on.
+i.e.
+#+begin_src lisp
+(symbol-value 'cat)
+#+end_src
+Throws an error.
+
 *** 1.2 exercise answers
 S, I, S, S, I, I, I, S, S, I, I, S
 
@@ -222,10 +230,10 @@ clump last args and apply to first
 #+end_src
 ** errors
 *** exercises
-1.21
-a. func is adding to a symbol
-b. equal not supplied 2 args
-c. not is supplied with too many args
+1.21, in order of appearance
+- func is adding to a symbol
+- equal not supplied 2 args
+- not is supplied with too many args
 
 ** review
 - 1.22 Yes, all predicates are functions, but not all functions are
@@ -246,3 +254,231 @@ predicates.
 
 * Chapter 2: Lists
 The most important data type :~)
+They're composed like linked lists in c, composed of =cons cells=.
+2.1 would look the same as the rgb list
+
+2.5
+- 5
+- 3
+- 4
+- 3
+- 5
+- 5
+
+nil and () are equal, only symbol that is a list as well
+#+begin_src lisp
+    (equal () nil)
+  (length nil)
+  '((()))
+#+end_src
+2.6
+- () -> nil
+- (()) -> (nil)
+- ((())) -> ((nil))
+- (() ()) -> (nil nil)
+- (() (())) -> (nil (nil))
+
+** list extraction
+#+begin_src lisp
+  (first '(a b c d))
+  (second '(a b c d))
+  (third '(a b c d))
+  (rest '(a b c d))
+
+  (defun my-second (lst)
+    (first (rest lst)))
+
+  (my-second '(a b c d))
+
+  ;; 2.8
+  (defun my-third (lst)
+    (first (rest (rest lst))))
+  (my-third '(a b c d ))
+  ;; 2.9 use second instead
+  (defun my-third (lst)
+    (second (rest lst)))
+
+#+end_src
+
+** car/cdr
+
+Car goes inside, while cdr goes to the next.
+#+begin_src lisp
+  (car '(a b c))
+  (cdr '(a b c))
+  (cdr '(a))
+  (cadr '(a b c))
+  (cdar '((a b) b c))
+  (caddr '(a b c d))
+  ;; 2.12 "ka-dih-dih-der"   
+  (cadddr '(a b c d))
+
+  (cadar '((blue cube) (red pyramid)))
+  ;; 2.13
+  (caaar '(((fun)) (in the) (sun)))
+  (caadr '(((fun)) (in the) (sun)))
+  (cadadr '(((fun)) (in the) (sun)))
+  (caaddr '(((fun)) (in the) (sun)))
+  ;; 2.15
+  (car '((a b) (c d) (e f)))
+  ;; ((e f))
+  (cddr '((a b) (c d) (e f)))
+  ;; (c d)
+  (cadr '((a b) (c d) (e f)))
+  ;; cadar -> b
+  (cadar '((a b) (c d) (e f)))
+  ;; cddar -> nil
+  (cddar '((a b) (c d) (e f)))
+  ;; caar -> a
+  (caar '((a b) (c d) (e f)))
+  ;; cdaddr -> (f) 
+  (cdaddr '((a b) (c d) (e f)))
+  ;; cadaddr -> f, but not supported(..?)
+  (car  (cdaddr '((a b) (c d) (e f))))
+
+  ;; 2.17
+  ;; post
+  (car '(post no bills))
+  ;; (no bills)
+  (cdr '(post no bills))
+  ;; (post no)
+  (car '((post no) bills))
+  ;; nil
+  (cdr '(bills))
+  ;; undefined
+  (car bills)
+  ;; ((no bills))
+  (cdr '(post (no bills)))
+  ;; nil
+  (cdr '((post no bills)))
+  ;; nil
+  (car nil)
+
+#+end_src
+
+** cons
+
+#+begin_src lisp
+
+  (cons 'a '(b c d))
+
+  (defun greet (lst)
+    (cons 'hello lst))
+
+  (greet '(professor higgins))
+
+  (cons 'a nil)
+
+  (cons nil nil)
+
+  (cons '(a b) nil)
+
+  ;; 2.18
+  (defun my-make-list (x y)
+    (cons x (cons y nil)))
+  (my-make-list 'fred 'george)
+#+end_src
+
+** list
+2.19
+- (fred and wilma)
+- (fred (and wilma))
+- (fred and wilma)
+- (nil)
+- (nil nil)
+
+#+begin_src lisp
+  (defun say-what (lst)
+    (cons 'what (cdr lst)))
+  (say-what '(take a nap))
+#+end_src
+
+2.20
+- (nil)
+- (t nil)
+- (t)
+- ((t))
+- ((in one ear and) (out the other))
+- ((in one ear and) out the other)
+#+begin_src lisp
+
+  ;; 2.21
+
+  (defun make-nested-tuple (w x y z)
+    (list (list w x)
+          (list y z)))
+  (make-nested-tuple 'a 'b 'c 'd)
+  ;; 2.22
+
+  (defun duo-cons (x y z)
+    "add two elements to list w/ cons"
+    (cons x (cons y z)))
+  (duo-cons 'x 'y '(z))
+
+  ;; 2.23
+
+  (defun two-deeper (lst)
+    "add two levels of parens"
+    (cons (cons  lst nil) nil))
+
+  (defun two-deeper (lst)
+    (list (list lst)))
+  (two-deeper 'a)
+
+  ;; 2.24
+  (cdr '(((good)) ((night))))
+  (caaadr '(((good)) ((night))))
+  ;; need to remember that cdr preserves parent parens
+#+end_src
+
+** lst predicates
+
+#+begin_src lisp
+
+  (listp nil)
+  (consp nil)
+  (atom nil)
+  (atom 18)
+  (null nil)
+#+end_src
+** review
+- 2.25 why do cons cells and cons function share same name?
+  because we're creating a cons cell with the cons function.
+- 2.26 returns 2 for the first, nil for the second
+- 2.27 when the elements themselves are lists
+- 2.28, yes, it is possible, as cdr moves the pointer forward and car
+  helps navigate nested lists. It may be an extremely long function
+  depending on the list, but it's possible, since with both we can
+  select every element, as the list is made of cons cells
+  
+#+begin_src lisp
+  ;; 2.29
+
+  (defun unary-add1 (lst)
+    (cons 'x lst))
+  (unary-add1 '(x x x))
+  ;; 2.30 -> subtracts 2
+  ;; 2.31
+  (defun unary-zerop (lst)
+    (zerop (length lst)))
+  (unary-zerop nil)
+  ;; 2.32
+  (defun unary-greaterp (x y)
+    (> (length x) (length y)))
+  (unary-greaterp '(x y z) '(y z))
+  ;; 2.33
+  ;; car checks whether the unary number is greater than zero
+
+  (cons 'a 'b)
+  ;; 2.34
+  (cons 'a
+        (cons 'b
+              (cons 'c
+                    'd)))
+  ;; 2.36 since creating lists with only cons requires you to first
+  ;; define the end, one cannot set the inside cons cell to the final
+  ;; cons cell upon creation. You need a variable
+
+#+end_src
+
+* Chapter 3: eval
