@@ -482,3 +482,64 @@ Car goes inside, while cdr goes to the next.
 #+end_src
 
 * Chapter 3: eval
+
+#+begin_src lisp
+  ;; 3.5
+  (defun half (x)
+    (/ x 2))
+  (half 4)
+
+  (defun cube (x)
+    (* x x x))
+  (cube 3)
+
+  (defun pythag (x y)
+    (sqrt (+ (* x x)
+             (* y y))))
+  (pythag 3 4)
+
+  (defun miles-per-gallon (init final gals)
+    (/ (- final init) gals))
+  (miles-per-gallon 10 30 10)
+#+end_src
+
+** variables
+3.9
+- (cons 5 (list 6 7)) -> (5 6 7)
+- (cons 5 '(list 6 7)) -> (5 list 6 7)
+- (3 from 9 gives 6)
+- 6
+- (is short for construct)
+3.10
+#+begin_src lisp
+  (third '(the quick brown fox))
+  ;; undefined symbol
+  (list 2 'and 2 'is 4)
+  ;; incorrect type, need to eval length
+  (+ 1 (length (list t t t t)))
+  ;; undefined list
+  (cons 'patrick '(seymour marvin))
+  ;; undefined symbols
+  (cons 'patrick (list 'seymour 'marvin))
+  ;; 3.11
+  (defun longer-than (x y)
+    (> (length x) (length y)))
+  (longer-than '(a b c) '(a b))
+  ;; 3.12
+  (defun addlength (lst)
+    (cons (length lst) lst))
+  (addlength '(a b))
+  ;; 4 3 a b c
+  (addlength (addlength '(a b c)))
+  ;; 3.13
+  ;; -> 2 params
+  ;; -> caller, callee
+  ;; (hello wanda this is fred speaking)
+  ;; no variable substitution
+
+
+#+end_src
+
+
+* conditionals
+
