@@ -540,6 +540,147 @@ Car goes inside, while cdr goes to the next.
 
 #+end_src
 
+* Chapter 4: Conditionals
 
-* conditionals
+** if
+#+begin_src lisp
+  (if (oddp 1) 'odd 'even)
+  (defun my-abs (x)
+    (if (< x 0) (- x) x))
+  (my-abs -5)
+  (my-abs 5)
 
+  ;; 4.1
+  (defun make-even (x)
+    (if (oddp x) (+ x 1) x))
+  (make-even 3)
+  (make-even 4)
+
+  ;; 4.2
+  (defun further (x)
+    (if 4))
+
+  ;; 4.3
+  (defun my-not (x)
+    (if (x) nil t))
+  ;; 4.4
+  (defun ordered (x y)
+    (if (> x y) (list y x) (list x y)))
+  (ordered 4 3)
+
+  ;; 4.6
+  (defun my-abs (x)
+    (cond ((< x 0) (- x))
+          ((> x 0) x)
+          (t x)))
+  (my-abs -3)
+  (my-abs 0)
+
+  ;; 4.8
+  (defun emphasize3 (x)
+    (cond ((equal (first x) 'good) (cons 'great (rest x)))
+          ((equal (first x) 'bad) (cons 'horrible (rest x)))
+          (t (cons 'very x))))
+  (emphasize3 '(good day))
+  (emphasize3 '(bad day))
+  (emphasize3 '(long day))
+
+
+  ;; 4.9 it always evals to t first
+  (defun make-odd (x)
+    (cond ((not (oddp x)) (+ x 1))
+          (t x)))
+  (make-odd 3)
+  (make-odd 4)
+
+  ;; 4.10
+
+  (defun constrain (x max min)
+    (cond
+      ((< x min) min)
+      ((> x max) max)
+      (t x)))
+  (constrain 5 10 3)
+  (constrain 2 10 3)
+  (constrain 11 10 3)
+
+  ;; 4.11
+  (defun firstzero (lst)
+    (cond
+      ((equal (first lst) 0) 'first)
+      ((equal (second lst) 0) 'second)
+      ((equal (third lst) 0) 'third)
+      (t 'none)))
+  (firstzero '(1 0 3))
+  (firstzero '(3 1 0))
+  (firstzero '(1 0 3))
+  (firstzero '(1 1 3))
+
+  ;; 4.12
+  (defun cycle (x)
+    (cond
+      ((< x 99) (+ x 1))
+      (t 1)))
+  (cycle 1)
+  (cycle 99)
+  ;; 4.13
+  (defun howcompute (x y res)
+    (cond
+      ((equal (+ x y) res) 'sum-of)
+      ((equal (* x y) res) 'product-of)
+      (t 'beats-me)))
+  ;; could extend it to the other operations, like quotient of
+
+#+end_src
+
+** and/or macros
+
+#+begin_src lisp
+  (defun small-positive-oddp (x)
+    (and (< x 100)
+         (> x 0)
+         (oddp x)))
+
+
+  ;; 4.15
+  (defun geq (x y)
+    (or (> x y) (equal x y)))
+  (geq 4 3)
+  (geq 4 4)
+  (geq 4 5)
+  ;; 4.16
+
+  (defun cond-sqaure (x)
+    (cond ((and (oddp x) (> x 0)) (* x x))
+          ((and (oddp x) (< x 0)) (* x 2))
+          (t (/ x 2))))
+
+  ;; 4.17
+  (defun match (s a)
+    (or (and (or (equal s 'boy)
+                 (equal s 'girl))
+             (equal a 'child))
+        (and (or (equal s 'man)
+                 (equal s 'woman))
+             (equal a 'adult))))
+  ;; 4.18
+  (defun play (p1 p2)
+    (cond ((equal p1 p2) 'tie)
+          ((is-winner p1 p2) 'first-wins)
+          ((is-winner p2 p1) 'second-wins)
+          (t 'error)))
+
+  (defun is-winner (player opponent)
+    (or (and (equal player 'rock)
+             (equal opponent 'scissors))
+        (and (equal player 'scissors)
+             (equal opponent 'paper))
+        (and (equal player 'paper)
+             (equal opponent 'rock))))
+
+  (play 'rock 'scissors)
+  (play 'scissors 'rock)
+  (play 'scissors 'scissors)
+  (play 'scissors 'paper)
+  (play 'paper 'scissors)
+#+end_src
