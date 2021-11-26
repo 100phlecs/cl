@@ -780,3 +780,202 @@ Car goes inside, while cdr goes to the next.
 
 
 #+end_src
+
+* Chapter 6: List Data Structures
+#+begin_src lisp
+
+  (cons '(eat at) 'joes)
+  (list '(eat at) 'joes)
+  (append '(eat at) 'joes)
+
+  (reverse '(1 2 3 4))
+
+  (nthcdr 2 '(a b c d))
+
+  (nth 2 '(a b c . d))
+
+  (last '(always last huh))
+  (remove 'a '(b a n a n a))
+
+  ;; 6.6
+
+  (defun last-element (lst)
+    (car (last lst)))
+  (last-element '(always last huh))
+
+  (defun last-element (lst)
+    (car (reverse lst)))
+
+  (defun last-element (lst)
+    (nth (- (length lst) 1) lst))
+  (last-element '(always last huh))
+
+  ;; 6.7
+  (defun next-to-last (lst)
+    (second (reverse lst)))
+
+  (defun next-to-last (lst)
+    (nth (- (length lst) 2) lst))
+  (next-to-last '(always last huh))
+
+  ;; 6.8
+  (defun my-butlast (lst)
+    (remove (nth (- (length lst) 1) lst) lst))
+  (my-butlast '(always last huh))
+
+  ;; 6.9 reduces to 'first
+  ;; 6.10
+
+  (defun is-palindrome (lst)
+    (equal lst (reverse lst)))
+  (is-palindrome '(a b c b a))
+  (defun make-palindrome (lst)
+    (append lst (reverse lst)))
+  (make-palindrome '(a b c))
+#+end_src
+** sets
+
+#+begin_src lisp
+  (setf ducks '(huey dewey louie))
+
+  (member 'huey ducks)
+
+  (defun beforep (x y lst)
+    "Returns true if X appears before Y in LST"
+    (member y (member x lst)))
+  (beforep 'a 'b '(a b c))
+
+  (set-difference '(a a a)
+         '(a))
+  ;; 6.24
+  (defun set-equal (set1 set2)
+    (and (subsetp set1 set2)
+         (subsetp set2 set1)))
+
+  (defun proper-set (set1 set2)
+    (and (subsetp set1 set2)
+         (not (subsetp set2 set1))))
+
+  (defun right-side (lst)
+    (rest (member '-vs- lst)))
+  (right-side '(epic time -vs- time epic))
+
+
+  (defun left-side (lst)
+    (reverse (rest (member '-vs- (reverse lst)))))
+  (left-side '(epic2 time2 -vs- time epic))
+
+  (defun count-common (leftlst rightlst)
+    (length (intersection leftlst rightlst)))
+
+  (defun compare (lst)
+    (list (count-common (left-side lst) (right-side lst)) 'common 'features))
+
+  (compare '(small red metal cube -vs-
+             red plastic small cube))
+#+end_src
+** tables
+#+begin_src lisp
+  (setf words
+        '((one un)
+          (two deux)
+          (three trois)
+          (four quatre)
+          (five cinq)))
+
+  (assoc 'three words)
+
+  ;; 6.28
+  (setf produce
+        '((apple . fruit)
+          (celery . veggie)
+          (banana . fruit)
+          (lettuce . veggie)))
+
+  ;; banana . fruit
+  (assoc 'banana produce)
+  ;; apple . fruit (first matching one)
+  (rassoc 'fruit produce)
+  ;; lettuce . veggie
+  (assoc 'lettuce produce)
+  ;; celery . veggie
+  (rassoc 'veggie produce)
+  ;; 6.29 length
+  (length produce)
+  ;; 6.30
+  (setf books
+        '((war-and-peace leo-tolstoy)
+          (catcher-in-the-rye jd-salinger)))
+  (defun who-wrote (book-name)
+    (second (assoc book-name books)))
+  (who-wrote 'catcher-in-the-rye)
+  (setf books (reverse books))
+  ;; 6.32 act the same, since reverse is top-level
+
+  ;; 6.33 table would have to reverse the entries, so the key is author
+
+  ;; 6.34
+  (setf atlas
+        '((new-jersey newark princeton trenton)
+          (pennsylvania pittsburgh johnstown)
+          (ohio columbus)))
+  (assoc 'new-jersey atlas)
+
+  ;; 6.36
+  (defun my-butlast (lst)
+    (remove (nth (- (length lst) 1) lst) lst))
+    (my-butlast '(always last huh))
+
+  (defun swap-first-last (lst)
+    (let ((last-val (car (last lst)))
+          (first-val (first lst)))
+      (cons last-val
+            (append
+             (remove first-val (remove last-val lst))
+             (list first-val)))))
+
+  (swap-first-last '(you cant buy love))
+
+  ;; 6.37
+  (defun rotate-left (lst)
+    (let ((first-val (first lst)))
+      (append (remove first-val lst) (list first-val))))
+
+  (rotate-left '(a b c d e))
+  (rotate-right '(a b c d e))
+
+  (defun rotate-right (lst)
+    (let ((last-val (last lst)))
+      (append last-val (remove (car last-val) lst))))
+
+  ;; 6.38
+  (set-difference '(y x z a) '(x y z))
+
+  ;; 6.39
+  ;; append
+
+  ;; 6.40
+  (setf transformed
+        '((a b c d)
+          (b c d)
+          (c d)
+          (d)))
+  (assoc 'c transformed)
+  (member 'c '(a b c d))
+
+  ;; 6.42
+  (defun royal-we (lst)
+    (subst 'we 'i lst))
+
+
+  (royal-we '(If I learn lisp I will be pleased))
+
+  (setf text '(b a n a n a p a n d a))
+  (remove 'a text)
+  (remove 'a text :count 2 :from-end t)
+
+
+#+end_src
+** TODO keyboard exercise & adv list
+
+* Chapter 7: Applicative Programming
