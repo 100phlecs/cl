@@ -684,3 +684,99 @@ Car goes inside, while cdr goes to the next.
   (play 'scissors 'paper)
   (play 'paper 'scissors)
 #+end_src
+
+* Chapter 5: Variables
+
+#+begin_src lisp
+  (defun average (x y)
+    (let ((sum (+ x y)))
+      (list x y 'average 'is (/ sum 2.0))))
+
+
+  (average 8 10)
+
+  (defun poor-style (p)
+    (setf p (+ p 5))
+    (list 'result 'is p))
+  ;; 5.1
+  (defun let-style (p)
+    (let ((p5 (+ p 5)))
+      (list 'result 'is p5)))
+
+  (let-style 5)
+
+  ;; let* does in order assignment, one at a time
+
+  (defun correct-size-range (x y z)
+    (let* ((biggest (max x y z))
+           (smallest (min x y z))
+           (r (/ biggest smallest 1.0)))
+      (list 'factor 'of r)))
+  (step
+
+ 
+   (correct-size-range 35 87 4))
+  ;; 5.4 because it needs to skip over evaluating the variable name upon
+  ;; declaration
+  ;; 5.5 I believe so.
+
+  ;; 5.6
+  (defun throw-die ()
+    "Returns a random number from 1 to 6"
+    (+ 1 (random 6)))
+  (throw-die)
+  (defun throw-dice ()
+    (let ((d1 (throw-die))
+          (d2 (throw-die)))
+      (list d1 d2)))
+  (throw-dice)
+
+  (defun snake-eyes-p (throw-outcome)
+    (equal throw-outcome '(1 1)))
+  (snake-eyes-p '(1 1))
+
+  (defun boxcars-p (throw-outcome)
+    (equal throw-outcome '(6 6)))
+  (boxcars-p '(6 6))
+
+  (defun instant-win-p (throw-outcome)
+    (or (equal 7 (reduce '+ throw-outcome))
+        (equal 11 (reduce '+ throw-outcome))))
+  (instant-win-p '(5 6))
+
+  (defun instant-loss-p (throw-outcome)
+    (or (equal 2 (reduce '+ throw-outcome))
+        (equal 3 (reduce '+ throw-outcome))
+        (equal 12 (reduce '+ throw-outcome))))
+  (instant-loss-p '(6 6))
+
+  (defun say-throw (throw-outcome)
+    (cond ((snake-eyes-p throw-outcome) 'snakeeyes)
+          ((boxcars-p throw-outcome) 'boxcars)
+          (t  (reduce '+ throw-outcome))))
+  (say-throw '(1 1))
+  (say-throw '(6 6))
+  (say-throw '(1 6))
+
+  (defun craps ()
+    (let* ((throw-outcome (throw-dice))
+           (throw-saying (say-throw throw-outcome))
+           (throw-result-print (list 'throw (car throw-outcome) 'and (cadr throw-outcome))))
+      (cond ((instant-win-p throw-outcome) (append throw-result-print (list '-- throw-saying '-- 'you 'win)))
+            ((instant-loss-p throw-outcome) (append throw-result-print (list '-- throw-saying '-- 'you 'lose)))
+            (t (append throw-result-print  (list '-- 'your 'point 'is throw-saying))))))
+  (craps)
+;; could make this more efficient
+  (defun try-for-point (n)
+    (let ((throw-outcome (throw-dice)))
+      (cond ((equal n (reduce '+ throw-outcome))
+             (list 'throw (car throw-outcome) 'and (cadr throw-outcome) '-- (say-throw throw-outcome) '-- 'you 'win))
+            ((equal 7 (reduce '+ throw-outcome))
+             (list 'throw (car throw-outcome) 'and (cadr throw-outcome) '-- (say-throw throw-outcome) '-- 'you 'lose))
+            (t
+             (list 'throw (car throw-outcome) 'and (cadr throw-outcome) '-- (say-throw throw-outcome) '-- 'throw 'again)))))
+
+  (try-for-point 6)
+
+
+#+end_src
