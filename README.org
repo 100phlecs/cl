@@ -968,8 +968,9 @@ Car goes inside, while cdr goes to the next.
     (subst 'we 'i lst))
 
 
-  (royal-we '(If I learn lisp I will be pleased))
 
+
+  (royal-we '(If I learn lisp I will be pleased))
   (setf text '(b a n a n a p a n d a))
   (remove 'a text)
   (remove 'a text :count 2 :from-end t)
@@ -979,3 +980,344 @@ Car goes inside, while cdr goes to the next.
 ** TODO keyboard exercise & adv list
 
 * Chapter 7: Applicative Programming
+
+#+begin_src lisp
+  (funcall #'cons 'a 'b)
+  (setf fn #'cons)
+  (funcall fn 'c 'd)
+  (type-of #'cons)
+
+  (defun square (n) (* n n))
+
+  (mapcar #'square '(1 2 3 4 5))
+
+  ;; 7.1
+  (defun add1 (n)
+    (+ n 1))
+  (mapcar #'1+ '(13 5 7 9))
+
+  ;; 7.2
+  (setf daily-planet
+        '((olsen jimmy 123-56-1234 cub-reporter)
+          (olsen jim 123-55-1234 cub-reporter)
+          (olsen joe 123-56-5234 cub-reporter)
+          (olsen john 123-56-1034 cub-reporter)))
+  (mapcar #'third daily-planet)
+
+  ;; 7.3
+  (mapcar #'zerop '(2 0 3 4 0 -5 -6))
+
+  ;; 7.4
+  (defun greater-than-5 (n)
+    (> n 5))
+  (mapcar #'greater-than-5 '(2 7 9 4))
+
+  ;; 7.5
+  (lambda (x) (- x 7))
+  ;; 7.6
+  (lambda (x) (or (equal t x)
+             (equal nil x)))
+  ;; 7.7
+  (mapcar #'(lambda (x) (if (equal x 'down) 'up 'down)) '(up down up up))
+
+  ;; 7.8
+
+
+  (find-if #'oddp '(2 3 4 5 6))
+  (defun my-assoc (key table)
+    "find a row within a table"
+    (find-if #'(lambda (entry)
+                 (equal key (first entry)))
+             table))
+
+  (defun rough-equal (x k)
+    "Finds first number in list X that is close to K"
+    (find-if #'(lambda (num)
+                 (and
+                  (< num (+ k 10))
+                  (> num (- k 10)))) x))
+
+  (rough-equal '(20 11 13) 10)
+  ;; 7.9
+  (defun find-nested (lst)
+    "Finds first list element within LST"
+    (find-if #'listp lst))
+
+  (find-nested '(1 ga 32 (test test2)))
+  ;; 7.10
+
+  (setf note-table
+        '((c 1)
+          (c-sharp 2)
+          (d 3)
+          (d-sharp 4)
+          (e 5)
+          (f 6)
+          (f-sharp 7)
+          (g 8)
+          (g-sharp 9)
+          (a 10)
+          (a-sharp 11)
+          (b 12)))
+
+  (defun numbers (lst)
+    "Translates list LST of note-keys to correspondent numbers"
+    (mapcar #'(lambda (note)
+                (second (assoc note note-table))) lst))
+  (numbers '(e d f c))
+  (defun notes (lst)
+    "Translates list LST of numbers to correspondent note-keys"
+    (mapcar #'(lambda (num)
+                (let ((num-indexed (mapcar #'reverse note-table)))
+                  (second (assoc num num-indexed)))) lst))
+
+  (notes (notes '(5 4 2 6)))
+  ;; d they're going to be nil
+  ;; e
+  (defun raise (n lst)
+    "Adds N to each item in LST"
+    (mapcar #'(lambda (num)
+                (+ num n)) lst))
+  (raise 5 '(5 3 1 3 5 5 5))
+
+  ;; This could be simplified with the mod function
+  (defun normalize (lst)
+    "Normalizes items in LST to be within octave range of 1-12"
+    (mapcar #'(lambda (n)
+                (cond ((> n 12) (- n 12))
+                      ((< n 1) (+ n 12))
+                      (t n))) lst))
+  (normalize '(6 10 13))
+
+  ;; with mod
+  (defun normalize-mod (lst)
+    (mapcar #'(lambda (n)
+                (mod n 12)) lst))
+
+  (defun transpose (n song)
+    "Transposes the song by N half steps"
+    (notes (normalize-mod (raise n (numbers song)))))
+  (transpose -1 '(e d c d e e e))
+
+
+#+end_src
+
+** remove-if
+#+begin_src lisp
+  (remove-if #'numberp '(2 for 1 sale))
+
+
+  ;; this is FILTER for lisp
+  (remove-if-not #'plusp '(2 0 -4 12 -23))
+  (remove-if-not #'symbolp '(3 apples 4 pears 2 plums))
+
+  ;; 7.11
+  (defun 2-4 (lst)
+    "Grabs numbers between 2-4 inclusive"
+    (remove-if-not (lambda (num)
+                     (and (> num 1) (< num 5)))
+                   lst))
+  (2-4 '(5 1 24 5 3 2 4))
+
+  ;; 7.12
+
+  (defun count-the (list)
+    "Count number of times 'the' appears in LST"
+    (length (remove-if-not (lambda (sym)
+                             (equal sym 'the))
+                           list)))
+  (count-the '(there once was the most magnificant man the world did ever see))
+
+  ;; 7.13
+  (defun length-2-only (lst)
+    "Filters out lists in LST that aren't length 2"
+    (remove-if-not (lambda (minilist)
+                     (equal 2 (length minilist)))
+                   lst))
+  (length-2-only '((2 a f) (2 f)))
+
+  ;; 7.14
+  (defun my-intersection (x y)
+    "Use remove-if-not to find intersection of two lists X Y"
+    (remove-if-not (lambda (e)
+                     (member e y))
+                   x))
+  (my-intersection '(a b c d f)
+                   '(a q c g f))
+  (my-union '(a b c d f)
+            '(a q c g f))
+
+  (defun my-union (x y)
+    "Use remove-if to reduce duplicates in the union of lists X Y"
+    (append x (remove-if #'(lambda (e)
+                             (member e x))
+                         y)))
+
+  ;; 7.15
+  (defun rank (card)
+    "Returns the rank of a card"
+    (first card))
+
+  (defun suit (card)
+    "Returns the suit of a card"
+    (second card))
+  (rank '(2 clubs))
+  (suit '(2 clubs))
+
+  (setf my-hand
+        '((3 hearts)
+          (5 clubs)
+          (2 diamonds)
+          (4 diamonds)
+          (ace spades)))
+  (defun count-suit (suit hand)
+    "Counts the number of cards belonging to SUIT in list HAND"
+    (length (remove-if-not #'(lambda (e)
+                               (equal suit (second e)))
+                           hand)))
+  (count-suit 'diamonds my-hand)
+
+  (setf colors
+        '((clubs black)
+          (diamonds red)
+          (hearts red)
+          (spades black)))
+
+  (defun color-of (card)
+    "Returns the color of CARD"
+    (second (assoc (second card) colors)))
+  (color-of '(2 clubs))
+
+  (defun first-red (hand)
+    "Finds the first red suit of list HAND"
+    (find-if (lambda (card) (equal (color-of card) 'red))
+             hand))
+  (first-red my-hand)
+
+  (defun black-cards (hand)
+    "Returns a list of black cards from HAND"
+    (remove-if-not (lambda (card)
+                     (equal (color-of card) 'black))
+                   hand))
+
+  (black-cards my-hand)
+
+
+  (defun what-ranks (suit hand)
+    "Finds the rank of all cards belonging to SUIT in HAND"
+    (mapcar #'first 
+            (remove-if-not (lambda (e)
+                             (equal (suit e) suit))
+                           hand)))
+
+  (what-ranks 'diamonds my-hand)
+
+  (setf all-ranks
+        '(2 3 4 5 6 7 8 9 10 jack queen king ace))
+
+  (defun beforep (x y l)
+    "Returns true if X appears before Y in L"
+    (member y (member x l)))
+
+  (defun higher-rank-p (c1 c2)
+    "Takes two cards and returns the higher rank card"
+    (if (beforep (rank c1) (rank c2) all-ranks)
+        c2 c1))
+
+  (higher-rank-p '(5 hearts) '(3 clubs))
+
+  (defun high-card (hand)
+    "Finds the highest rank within HAND"
+    (reduce #'higher-rank-p hand))
+
+  (high-card my-hand)
+#+end_src
+** reduce operator
+#+begin_src lisp
+
+  (reduce #'+ '(1 2 3))
+  (reduce #'* '(1 2 4))
+
+  (reduce #'append '((one un) (two deux) (three trois)))
+  ;; 7.16 union
+  (reduce #'union '((a b c) (c d a) (f b d) (g)))
+  ;; 7.17
+  (defun total-length (lst)
+    "Given LST find total number of elements"
+    (length (reduce #'append lst)))
+
+  (total-length '((a b c) (c d a) (f b d) (g)))
+
+  ;; 7.18 because 0 in addition or 1 in multiplication does not affect
+  ;; the end result
+
+
+#+end_src
+
+** every
+#+begin_src lisp
+  (every #'numberp '(1 2 3 4 5))
+
+  (every (lambda (x) (> x 0)) '(1 2 3 4 5))
+
+  ;; 7.19
+  (defun all-odd (lst)
+    "doc"
+    (every #'oddp lst))
+  ;; 7.20
+  (defun none-odd (lst)
+    "Returns T if every element is not odd"
+    (every #'evenp lst))
+
+  (defun not-all-odd (lst)
+    "Returns T if LST is not entirely odd"
+    (not (all-odd lst)))
+
+  (defun not-none-odd (lst)
+    "Returns T if LST is not entirely even"
+    (not (none-odd lst)))
+
+  ;; 7.23 -> the same for the last two, would rename to 'not-uniform' and
+  ;; merge
+
+  ;; 7.24 -> Applicative operators are functions that apply other funcs to
+  ;; data structs
+
+  ;; 7.25 -> lambda expressions are useful with applicative operators since
+  ;; you do not need to go define a func to only use it in an operator
+
+  ;; 7.26 ->
+  (defun my-find-if (fnc lst)
+    "Return the first element that satisfies FNC in LST"
+    (first (remove-if-not fnc lst)))
+
+  (my-find-if #'oddp '(2 5 3 4 1))
+
+  ;; 7.27
+  (defun my-every (fnc lst)
+    "Return if all elements in LST satisfy FNC"
+    (equal (remove-if fnc lst) nil))
+
+  (my-every #'oddp '(1 3 5 7 9))
+
+  ;; trace func
+  (trace my-every)
+
+
+  (defun half (n) (* n 0.5))
+
+  (defun average (x y)
+    (+ (half x)
+       (half y)))
+
+  (trace half average)
+  (average 3 7)
+
+#+end_src
+** TODO keyboard exercise & extras, for review
+
+#+begin_src lisp
+  ;; 7.29
+
+#+end_src
+* Chapter 8: Recursion
