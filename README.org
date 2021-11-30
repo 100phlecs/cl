@@ -1314,10 +1314,117 @@ Car goes inside, while cdr goes to the next.
   (average 3 7)
 
 #+end_src
-** TODO keyboard exercise & extras, for review
+** BACKLOG keyboard exercise & extras, for review
 
 #+begin_src lisp
   ;; 7.29
 
 #+end_src
 * Chapter 8: Recursion
+
+#+begin_src lisp
+
+
+  (defun anyoddp (x)
+    (cond ((null x) nil)
+          ((oddp (first x)) t)
+          (t (anyoddp (rest x)))))
+  (if-anyoddp '(2 4 7 8))
+
+  (trace anyoddp)
+
+  ;; 8.2
+  (defun if-anyoddp (x)
+    (if (null x) nil
+        (if (oddp (first x))
+            t
+            (if-anyoddp (rest x)))))
+
+
+  (defun fact (n)
+    "factorial"
+    (cond ((zerop n) 1)
+          (t (* n (fact (- n 1))))))
+
+  (trace fact)
+  (fact 20.0)
+  (fact 20)
+
+  (defun laugh (n)
+    (cond ((< n 1) nil)
+          (t (cons 'ha (laugh (- n 1))))))
+
+  (laugh 3)
+  (laugh 5)
+  (laugh -1)
+  (laugh 0)
+
+  ;; 8.5
+  (defun add-up (x)
+    (cond ((null x) 0)
+          (t (+ (first x) (add-up (rest x))))))
+
+  (add-up '(2 3 7))
+
+  ;; 8.6
+  (defun alloddp (x)
+    (cond ((null x) t)
+          ((evenp (first x)) nil)
+          (t (alloddp (rest x)))))
+
+  (alloddp '(3 7 9))
+
+  ;; 8.7
+  (defun rec-member (el lst)
+    (cond ((null lst) nil)
+          ((equal el (first lst)) lst)
+          (t (rec-member el (rest lst)))))
+  (member 3 '(7 1 2 5 4 2 3 4 5))
+  (rec-member 3 '(7 1 2 5 4 2 3 4 5))
+
+  ;; 8.8
+  (defun rec-assoc (el x)
+    (cond ((null x) nil)
+          ((equal el (first (first x))) (first x))
+          (t (rec-assoc el (rest x)))))
+
+  (setf bananas
+        '((red japan)
+          (blue germany)))
+  (assoc 'red bananas)
+  (rec-assoc 'red bananas)
+
+  ;; 8.9
+  (defun rec-nth (n lst)
+    (cond ((null lst) nil)
+          ((zerop n) (first lst))
+          (t (rec-nth (- n 1) (rest lst)))))
+
+  (nth 2 '(2 3 4 5 1))
+  (rec-nth 2 '(2 3 4 5))
+
+  ;; 8.11
+  (defun fib (n)
+    (cond ((< n 2) 1)
+          (t (+
+              (fib (- n 1))
+              (fib (- n 2))))))
+
+  (fib 4)
+  ;; 8.12
+  ;; will recurse infinitely w/ circular list
+
+  ;; 8.13 give negative input
+  ;; 8.14
+  ;; (defun rec ()
+  ;;   (rec))
+
+  ;; 8.15
+  ;; car is x
+  ;; cdr is the same list
+  ;; recurse infinitely
+
+#+end_src
+** BACKLOG visit recursion more in-depth when wanted
+
+* Chapter 9: I/O
