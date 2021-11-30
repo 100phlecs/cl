@@ -1512,3 +1512,51 @@ Car goes inside, while cdr goes to the next.
 
   (make-graph)
 #+end_src
+
+* Chapter 10: Assignment
+
+#+begin_src lisp
+
+  (setf *total-glass*  0)
+
+  (defun make-board ()
+    (list 'board 0 0 0 0 0 0 0 0 0 0))
+
+  (defun convert-to-letter (v)
+    (cond ((equal v 1) "O")
+          ((equal v 10) "X")
+          (t " ")))
+
+  (defun print-row (x y z)
+    (format t "~&   ~A | ~A | ~A"
+            (convert-to-letter x)
+            (convert-to-letter y)
+            (convert-to-letter z)))
+
+  (defun print-board (board)
+    (format t ".~%")
+    (print-row (nth 1 board) (nth 2 board) (nth 3 board))
+    (format t "~% -------------")
+    (print-row (nth 4 board) (nth 5 board) (nth 6 board))
+    (format t "~% -------------")
+    (print-row (nth 7 board) (nth 8 board) (nth 9 board))
+    (format t "~%~%"))
+
+  (setf b (make-board))
+
+  (print-board b)
+
+  (defun make-move (player pos board)
+    (setf (nth pos board) player)
+    board)
+
+  (setf *computer* 10)
+  (setf *opponent* 1)
+
+  (make-move *opponent* 3 b)
+
+  (setf *triplets*
+        '((1 2 3) (4 5 6) (7 8 9)
+          (1 4 7) (2 5 8) (3 6 9)
+          (1 5 9) (3 5 7)))
+#+end_src
