@@ -1560,3 +1560,117 @@ Car goes inside, while cdr goes to the next.
           (1 4 7) (2 5 8) (3 6 9)
           (1 5 9) (3 5 7)))
 #+end_src
+
+* Chapter 11: Iteration & Block Structure
+
+#+begin_src lisp
+
+  (dotimes (i 4)
+    (format t "~&I is ~S." i))
+
+  (dolist (x '(red blue green) 'flowers)
+    (format t "~&Roses are ~S." x))
+
+  (defun find-first-odd (list-of-numbers)
+    (dolist (e list-of-numbers)
+      (format t "~&Testing ~S..." e)
+      (when (oddp e)
+        (format t "found an odd number.")
+        (return e))))
+  (find-first-odd '(2 4 6 7 8))
+
+  ;; 11.1
+  (defun it-member (el lst)
+    (dolist (e lst)
+      (when (equal e el)
+        (return t))))
+  (it-member 7 '(1 2 5 234 9 7 892))
+  ;; 11.2
+  (defun it-assoc (el lst)
+    (dolist (e lst)
+      (when (equal (first e) el)
+        (return e))))
+  ;; 11.3
+  (defun check-all-odd (lst)
+    (cond ((null lst) t)
+          ((progn
+             (format t "~&Checking ~S..." (first lst))
+             (evenp (first lst)))
+           nil)
+          (t (check-all-odd (rest lst)))))
+  (check-all-odd '(1 3 5))
+
+  ;; repetitive setting
+  (defun it-fact (n)
+    (let ((prod 1))
+      (dotimes (i n prod)
+        (setf prod (* prod (+ i 1))))))   ; zero indexing
+
+
+  (it-fact 5)
+
+  (defun it-intersection (x y)
+    (let ((result-set nil))
+      (dolist (element x result-set)
+        (when (member element y)
+          (push element result-set)))))
+  (it-intersection '(f a c e)
+                   '(c l o v e))
+  ;; 11.4
+
+  (defun it-length (lst)
+    (let ((lst-length 0))
+      (dolist (el lst lst-length)
+        (setf lst-length (+ 1 lst-length)))))
+  (it-length '(1 2 3 4))
+  (length '(1 2 3 4))
+
+  ;; 11.5
+  (defun it-nth (n lst)
+    (let ((idx 0))
+      (dolist (el lst)
+        (when (equal n idx)
+          (return el))
+        (setf idx (+ idx 1)))))
+  (nth 3 '(1 2 345 3 5 1 3 4))
+  (it-nth 3 '(1 2 345 7 5 1 3 4))
+
+  ;; 11.6
+  (defun it-union (x y)
+    (let ((union-res y))
+      (dolist (el x union-res)
+        (when (not (member el y))
+          (push el union-res)))))
+  (union '(5 12 4 2 3) '(2 12 3 4))
+  (it-union '(5 12 4 2 3) '(2 12 3 4))
+  (it-union '(1 2 3) '(2 3 4))
+
+  (defun launch (n)
+    (do ((cnt n (- cnt 1)))
+        ((zerop cnt) (format t "Blast off!"))
+      (format t "~S..." cnt)))
+  (launch 10)
+#+end_src
+
+* Chapter 13: Arrays, HashTables & Property Lists
+
+#+begin_src lisp
+  (setf *print-array* t)
+
+  (setf a '#(nil nil nil nil nil))
+  (setf (aref a 0) 'foo)
+  (setf (aref a 1) 37)
+  (setf (aref a 2) 'bar)
+
+  (make-array 5 :initial-element 1)
+  ;; strings are vectors/sequences
+  (length "string")
+
+
+  (coerce "string" 'list)
+#+end_src
+
+* Chapter 14: Macros & Compilation
+going to check On Lisp for building macros
+
+* TODO compare answers to back of book for review
